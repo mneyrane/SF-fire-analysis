@@ -11,6 +11,8 @@ sns.set_theme(context='paper', style='darkgrid', font='Arimo')
 data_dir = Path(__file__).parents[1] / 'data'
 fig_dir = Path(__file__).parents[1] / 'figures'
 
+fig_dir.mkdir(exist_ok=True)
+
 nmi_path = data_dir / 'DP-nm_incidents.csv.gz'
 com_path = data_dir / 'DP-fire_safety_complaints.csv.gz'
 bdry_path = data_dir / 'DP-SF_boundary.csv.gz'
@@ -37,21 +39,20 @@ s_com = s_com.apply(from_wkt)
 gs_com = gpd.GeoSeries(s_com, crs='EPSG:2227')
 
 # generate KDE plots
-plt.figure()
-ax = gs_bdry.boundary.plot(edgecolor='black', linewidth=.25)
-xlim, ylim = ax.get_xlim(), ax.get_ylim()
-sns.kdeplot(x=gs_nmi_fire.x, y=gs_nmi_fire.y, color='orange', fill=True, ax=ax)
-ax.set_xlim(*xlim)
-ax.set_ylim(*ylim)
+fig, axs = plt.subplots(1, 2)
 
-plt.savefig(fig_dir / 'fire_incidents_KDE.svg')
+gs_bdry.boundary.plot(edgecolor='black', linewidth=.5, ax=axs[0])
+xlim, ylim = axs[0].get_xlim(), axs[0].get_ylim()
+sns.kdeplot(x=gs_nmi_fire.x, y=gs_nmi_fire.y, color='red', fill=True, ax=axs[0])
+axs[0].set_xlim(*xlim)
+axs[0].set_ylim(*ylim)
+axs[0].set_title('Fire-related incidents')
 
+gs_bdry.boundary.plot(edgecolor='black', linewidth=.5, ax=axs[1])
+xlim, ylim = axs[1].get_xlim(), axs[1].get_ylim()
+sns.kdeplot(x=gs_com.x, y=gs_com.y, color='blue', fill=True, ax=axs[1])
+axs[1].set_xlim(*xlim)
+axs[1].set_ylim(*ylim)
+axs[1].set_title('Fire safety complaints')
 
-plt.figure()
-ax = gs_bdry.boundary.plot(edgecolor='black', linewidth=.25)
-xlim, ylim = ax.get_xlim(), ax.get_ylim()
-sns.kdeplot(x=gs_com.x, y=gs_com.y, color='blue', fill=True, ax=ax)
-ax.set_xlim(*xlim)
-ax.set_ylim(*ylim)
-
-plt.savefig(fig_dir / 'complaints_KDE.svg')
+fig.savefig(fig_dir / 'fire_inc_and_complaints_KDE.svg', bbox_inches='tight')

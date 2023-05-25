@@ -13,6 +13,8 @@ sns.set_theme(context='paper', style='darkgrid', font='Arimo')
 data_dir = Path(__file__).parents[1] / 'data'
 fig_dir = Path(__file__).parents[1] / 'figures'
 
+fig_dir.mkdir(exist_ok=True)
+
 nmi_path = data_dir / 'DP-nm_incidents.csv.gz'
 com_path = data_dir / 'DP-fire_safety_complaints.csv.gz'
 
@@ -41,7 +43,7 @@ gdf_com = gpd.GeoDataFrame(df_com, geometry='Location', crs='EPSG:2227')
 
 FT_TO_KM = 3.048e-4
 RADIUS_KM = 0.5
-SAMPLE_SIZE = 1000
+SAMPLE_SIZE = 2000
 
 t_offset = pd.Timedelta('30 days')
 t_start = pd.Timestamp('2020-01-01') + t_offset
@@ -79,8 +81,9 @@ counts = gdf_com_sample.apply(
     args=(gdf_nmi_fire,))
 
 
-sns.histplot(data=counts, multiple='dodge', binwidth=2, shrink=.9)
-plt.savefig(fig_dir / 'fire_incidents_vs_complaints.svg')
+ax = sns.histplot(data=counts, multiple='dodge', binwidth=3, shrink=.9)
+ax.set_xlabel('Fire-related incidents near complaint (30 days, 500 m)')
+plt.savefig(fig_dir / 'fire_incidents_vs_complaints_analysis.svg', bbox_inches='tight')
 
 # run Mann-Whitney U-test on BEFORE and AFTER complaint counts
 res = stats.mannwhitneyu(x=counts['before'], y=counts['after'])

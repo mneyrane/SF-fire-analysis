@@ -11,11 +11,15 @@ sns.set_theme(context='paper', style='darkgrid', font='Arimo')
 data_dir = Path(__file__).parents[1] / 'data'
 fig_dir = Path(__file__).parents[1] / 'figures'
 
+fig_dir.mkdir(exist_ok=True)
+
 calls_path = data_dir / 'DP-fire_service_calls.csv.gz'
-incs_path = data_dir / 'DP-nm_incidents.csv.gz'
+inc_path = data_dir / 'DP-nm_incidents.csv.gz'
+com_path = data_dir / 'DP-fire_safety_complaints.csv.gz'
 
 df_calls = pd.read_csv(calls_path)
-df_incs = pd.read_csv(incs_path)
+df_inc = pd.read_csv(inc_path)
+df_com = pd.read_csv(com_path)
 
 #
 # create and save Call Type Count figure
@@ -33,23 +37,35 @@ print(f"Number of top 10 call types (no medical incidents): {ct_count_top10.sum(
 
 plt.figure()
 sns.barplot(x=ct_count_top10.values, y=ct_count_top10.index, palette='flare')
-plt.savefig(fig_dir / 'call_type_counts.svg', bbox_inches='tight', pad_inches=.25)
+plt.savefig(fig_dir / 'call_type_counts.svg', bbox_inches='tight')
 
 #
-# Create and save Situation count as given by the dataset of "Fire Incidents".
+# Create and save Situation and Response count as given by the dataset of 
+# "Fire Incidents".
 #
-# "Fire Incidents" are defined by non-medical incidents, as reported in the
-# open data portal. The incident numbers in this dataset occur in the Fire
-# Service Calls dataset, and is effectively a subset.
-print(f"Total number of (non-medical) incidents: {len(df_incs)}")
+# "Fire Incidents" are defined by non-medical incidents (but still includes
+# emergency incidents), as reported in the open data portal. The incident 
+# numbers in this dataset occur in the Fire Service Calls dataset, and is 
+# effectively a subset.
+print(f"Total number of (non-medical) incidents: {len(df_inc)}")
 
-s_count = df_incs['Situation Summary'].value_counts()
-r_count = df_incs['Response Summary'].value_counts()
+s_count = df_inc['Situation Summary'].value_counts()
+r_count = df_inc['Response Summary'].value_counts()
 
 plt.figure()
 sns.barplot(x=s_count.values, y=s_count.index, palette='flare')
-plt.savefig(fig_dir / 'nm_situation_counts.svg', bbox_inches='tight', pad_inches=.25)
+plt.savefig(fig_dir / 'nm_situation_counts.svg', bbox_inches='tight')
 
 plt.figure()
 sns.barplot(x=r_count.values, y=r_count.index, palette='flare')
-plt.savefig(fig_dir / 'nm_response_counts.svg', bbox_inches='tight', pad_inches=.25)
+plt.savefig(fig_dir / 'nm_response_counts.svg', bbox_inches='tight')
+
+#
+# create and save Complaint Type Count figure
+print(f"Total number of fire safety complaints: {len(df_com)}")
+
+c_count = df_com['Complaint Type'].value_counts()
+
+plt.figure()
+sns.barplot(x=c_count.values, y=c_count.index, palette='flare')
+plt.savefig(fig_dir / 'complaint_type_counts.svg', bbox_inches='tight')

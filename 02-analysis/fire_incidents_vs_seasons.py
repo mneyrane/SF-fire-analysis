@@ -14,11 +14,13 @@ sns.set_theme(context='paper', style='darkgrid', font='Arimo')
 data_dir = Path(__file__).parents[1] / 'data'
 fig_dir = Path(__file__).parents[1] / 'figures'
 
+fig_dir.mkdir(exist_ok=True)
+
 nmi_path = data_dir / 'DP-nm_incidents.csv.gz'
 
 # load fire incidents
 df_nmi = pd.read_csv(
-    nmi_path, 
+    nmi_path,
     usecols=['Incident Date', 'Incident Number', 'Situation Summary'],
     parse_dates=['Incident Date'])
 
@@ -26,14 +28,14 @@ df_fire = df_nmi[df_nmi['Situation Summary'] == 'Fire']
 df_fire = df_fire.drop('Situation Summary', axis='columns')
 df_fire = df_fire.reset_index(drop=True)
 
-SAMPLE_SIZE = 2000
+SAMPLE_SIZE = 2500
 
 df_fire_sample = df_fire.sample(n=SAMPLE_SIZE, axis='index')
 
-week_groupby = df_fire_sample.groupby(pd.Grouper(key='Incident Date', freq='D'))
-week_count = week_groupby.count()
-week_count = week_count.reset_index()
-week_count = week_count.rename({'Incident Number' : 'Incident Count'}, axis='columns')
+period_groupby = df_fire_sample.groupby(pd.Grouper(key='Incident Date', freq='3D'))
+period_count = period_groupby.count()
+period_count = period_count.reset_index()
+period_count = period_count.rename({'Incident Number' : 'Incident Count'}, axis='columns')
 
 def month_to_season(x):
     if x.month in (12,1,2):
@@ -45,16 +47,24 @@ def month_to_season(x):
     else:
         return 'autumn'
     
-week_count['Season'] = week_count['Incident Date'].apply(month_to_season)
+period_count['Season'] = period_count['Incident Date'].apply(month_to_season)
 
-sns.histplot(week_count, x='Incident Count', hue='Season', multiple='dodge', binwidth=1, shrink=.9)
-plt.savefig('test.png')
+fig, axs = plt.subplots(1, 2, figsize=(9,3))
+
+sns.histplot(period_count, x='Incident Count', hue='Season', multiple='dodge', binwidth=2, shrink=.9, ax=axs[0])
+sns.boxplot(period_count, x='Incident Count', y='Season', ax=axs[1])
+
+axs[0].set_xlabel('Fire-related incidents (3 day interval)')
+axs[1].set_xlabel('Fire-related incidents (3 day interval)')
+
+fig.tight_layout()
+fig.savefig(fig_dir / 'fire_incidents_vs_seasons_analysis.svg', bbox_inches='tight')
 
 season_counts = [
-    week_count.loc[week_count['Season'] == 'winter', 'Incident Count'],
-    week_count.loc[week_count['Season'] == 'spring', 'Incident Count'],
-    week_count.loc[week_count['Season'] == 'summer', 'Incident Count'],
-    week_count.loc[week_count['Season'] == 'autumn', 'Incident Count'],
+    period_count.loc[period_count['Season'] == 'winter', 'Incident Count'],
+    period_count.loc[period_count['Season'] == 'spring', 'Incident Count'],
+    period_count.loc[period_count['Season'] == 'summer', 'Incident Count'],
+    period_count.loc[period_count['Season'] == 'autumn', 'Incident Count'],
 ]
 
 var_res = stats.levene(*season_counts)
@@ -71,5 +81,6 @@ print('ANOVA statistic:', anova.statistic)
 print('ANOVA p-value:', anova.pvalue)
 
 posthoc = stats.tukey_hsd(*season_counts)
+posthoc.confidence_interval(0.99)
 
 print(posthoc)
