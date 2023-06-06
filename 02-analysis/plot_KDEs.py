@@ -5,8 +5,8 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from shapely import from_wkt
 
-sns.set_theme(context='paper', style='darkgrid', font='Arimo')
-
+sns.set_theme(context='paper', style='whitegrid', font='Arimo')
+facecolor = '#f8f5f0'
 
 data_dir = Path(__file__).parents[1] / 'data'
 fig_dir = Path(__file__).parents[1] / 'figures'
@@ -39,7 +39,7 @@ s_com = s_com.apply(from_wkt)
 gs_com = gpd.GeoSeries(s_com, crs='EPSG:2227')
 
 # generate KDE plots
-fig, axs = plt.subplots(1, 2)
+fig, axs = plt.subplots(1, 2, figsize=(8,4), facecolor=facecolor)
 
 gs_bdry.boundary.plot(edgecolor='black', linewidth=.5, ax=axs[0])
 xlim, ylim = axs[0].get_xlim(), axs[0].get_ylim()
@@ -53,6 +53,6 @@ xlim, ylim = axs[1].get_xlim(), axs[1].get_ylim()
 sns.kdeplot(x=gs_com.x, y=gs_com.y, color='blue', fill=True, ax=axs[1])
 axs[1].set_xlim(*xlim)
 axs[1].set_ylim(*ylim)
-axs[1].set_title('Fire safety complaints')
+axs[1].set_title('Fire-related safety complaints')
 
 fig.savefig(fig_dir / 'fire_inc_and_complaints_KDE.svg', bbox_inches='tight')

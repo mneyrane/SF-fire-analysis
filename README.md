@@ -53,32 +53,26 @@ Scripts sharing the same number are viewed as independent.
 
 Finally, *all the datasets the scripts work on should be placed in the* `data/` *directory*.
 
-### Order of execution and commands
+### Executing scripts
 
-**FIRST FOLDER**
-...
-
-- SCRIPT NAME:
-    - Input: INPUT FILENAME
-    - Output: OUTPUT FILENAME
-    - Approximate runtime: TIME (IN SECONDS)
-    - Command: `TERMINAL COMMAND TO RUN`
-    ----
-- REPEAT: ...
-
-**SECOND FOLDER**
-...
+The scripts can be run via `python3 SCRIPT_PATH` from any location, as any data output will be saved in `data/`. Plots are generated in `figures/`.
 
 ## Technical details
 
-### Data usage and availability
+### Data usage, availability and limitations
 
-...
+All the data in the analysis was obtained from the [San Francisco open data portal](https://datasf.org/opendata/) during May 2023.
+For service calls, incidents and safety complaints, the analysis only used data extracted over 3 years from 2020 to 2022.
+Some key limitations that could affect the analysis are:
 
-### Processing and limitations
-
-...
+- Zoning districts changing during the 3-year window of our data. The zoning map is updated quarterly and the city undergoes active development. We do not have direct access to earlier versions of the zoning map, but it may be possible to get it from contact through the data maintainer. Therefore, the accuracy of our zone-related analysis in Question 3 crucially relies on zone changes being relatively small.
+- A very small number of fire incidents cannot be assigned a zone due to the coverage of geometry. As a workaround, the spatial join assigns a *nearest* zone to each incident.
+- Some of the fire service data contains missing values or erroneous date entries. We did not attempt to correct them and instead omitted them from the analysis. After removing these entries, we still retain at least 98% of the data in each dataset.
 
 ### Caveats with inferential statistics
 
-...
+Commonly with inferential statistics, the primary limitation is failing to satisfy one or more assumptions in each hypothesis test.
+There are two primary assumptions that are potentially violated for each question in the analysis.
+
+- **Independence** *(all questions)*: For each test, we perform independent random draws of the data to enforce independence. However, we do not expect the data to be independent in general. For example, in Question 1, complaints in spatiotemporal proximity could have overlapping fire incidents.
+- **Normality** *(question 2)*: The fire incident count is nonnegative, so the data cannot be normally distributed.

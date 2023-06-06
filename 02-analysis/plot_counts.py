@@ -5,8 +5,8 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 
 
-sns.set_theme(context='paper', style='darkgrid', font='Arimo')
-
+sns.set_theme(context='paper', style='whitegrid', font='Arimo')
+facecolor = '#f8f5f0'
 
 data_dir = Path(__file__).parents[1] / 'data'
 fig_dir = Path(__file__).parents[1] / 'figures'
@@ -35,7 +35,9 @@ print(f"Total number of calls: {ct_count.sum()}")
 print(f"Number of medical incidents: {ct_count['Medical Incident']}")
 print(f"Number of top 10 call types (no medical incidents): {ct_count_top10.sum()}")
 
-plt.figure()
+#print(ct_count_top10)
+
+plt.figure(facecolor=facecolor)
 sns.barplot(x=ct_count_top10.values, y=ct_count_top10.index, palette='flare')
 plt.savefig(fig_dir / 'call_type_counts.svg', bbox_inches='tight')
 
@@ -52,11 +54,14 @@ print(f"Total number of (non-medical) incidents: {len(df_inc)}")
 s_count = df_inc['Situation Summary'].value_counts()
 r_count = df_inc['Response Summary'].value_counts()
 
-plt.figure()
+#print(s_count)
+#print(r_count)
+
+plt.figure(facecolor=facecolor)
 sns.barplot(x=s_count.values, y=s_count.index, palette='flare')
 plt.savefig(fig_dir / 'nm_situation_counts.svg', bbox_inches='tight')
 
-plt.figure()
+plt.figure(facecolor=facecolor)
 sns.barplot(x=r_count.values, y=r_count.index, palette='flare')
 plt.savefig(fig_dir / 'nm_response_counts.svg', bbox_inches='tight')
 
@@ -66,6 +71,8 @@ print(f"Total number of fire safety complaints: {len(df_com)}")
 
 c_count = df_com['Complaint Type'].value_counts()
 
-plt.figure()
-sns.barplot(x=c_count.values, y=c_count.index, palette='flare')
+#print(c_count)
+
+plt.figure(facecolor=facecolor)
+ax = sns.barplot(x=c_count.values, y=c_count.index, palette='flare')
 plt.savefig(fig_dir / 'complaint_type_counts.svg', bbox_inches='tight')

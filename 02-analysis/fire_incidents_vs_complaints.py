@@ -7,8 +7,9 @@ import matplotlib.pyplot as plt
 from shapely import from_wkt
 from scipy import stats
 
-sns.set_theme(context='paper', style='darkgrid', font='Arimo')
-
+sns.set_theme(context='paper', style='whitegrid', font='Arimo')
+facecolor = '#f8f5f0'
+np.random.seed(42)
 
 data_dir = Path(__file__).parents[1] / 'data'
 fig_dir = Path(__file__).parents[1] / 'figures'
@@ -50,8 +51,8 @@ t_start = pd.Timestamp('2020-01-01') + t_offset
 t_end = pd.Timestamp('2022-12-31') - t_offset
 
 date_mask = (gdf_com['Received Date'] >= t_start) & (gdf_com['Received Date'] <= t_end)
-gdf_com_sample = gdf_com[date_mask]
-gdf_com_sample = gdf_com_sample.sample(n=SAMPLE_SIZE, axis='index')
+gdf_com_masked = gdf_com[date_mask]
+
 
 def f(x, gdf):
     date = x['Received Date']
@@ -71,17 +72,26 @@ def f(x, gdf):
     count_after = (dist_after <= RADIUS_KM).sum()
     
     return {'before' : count_before, 'after' : count_after}
-    
-    
 
-counts = gdf_com_sample.apply(
+
+counts = gdf_com_masked.apply(
     f, 
     axis='columns', 
     result_type='expand', 
     args=(gdf_nmi_fire,))
 
+before_sample = counts['before'].sample(n=SAMPLE_SIZE)
+print(before_sample)
+before_sample = before_sample.reset_index(drop=True)
 
-ax = sns.histplot(data=counts, multiple='dodge', binwidth=3, shrink=.9)
+after_sample = counts['after'].sample(n=SAMPLE_SIZE)
+print(after_sample)
+after_sample = after_sample.reset_index(drop=True)
+
+count_sample = pd.DataFrame({'before' : before_sample, 'after' : after_sample})
+
+plt.figure(facecolor=facecolor)
+ax = sns.histplot(data=count_sample, multiple='dodge', binwidth=3, shrink=.9)
 ax.set_xlabel('Fire-related incidents near complaint (30 days, 500 m)')
 plt.savefig(fig_dir / 'fire_incidents_vs_complaints_analysis.svg', bbox_inches='tight')
 

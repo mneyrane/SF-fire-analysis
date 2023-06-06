@@ -7,9 +7,9 @@ import matplotlib.pyplot as plt
 #from shapely import from_wkt
 from scipy import stats
 
-
-sns.set_theme(context='paper', style='darkgrid', font='Arimo')
-
+sns.set_theme(context='paper', style='whitegrid', font='Arimo')
+facecolor = '#f8f5f0'
+np.random.seed(42)
 
 data_dir = Path(__file__).parents[1] / 'data'
 fig_dir = Path(__file__).parents[1] / 'figures'
@@ -28,7 +28,7 @@ df_fire = df_nmi[df_nmi['Situation Summary'] == 'Fire']
 df_fire = df_fire.drop('Situation Summary', axis='columns')
 df_fire = df_fire.reset_index(drop=True)
 
-SAMPLE_SIZE = 2500
+SAMPLE_SIZE = 2000
 
 df_fire_sample = df_fire.sample(n=SAMPLE_SIZE, axis='index')
 
@@ -36,6 +36,8 @@ period_groupby = df_fire_sample.groupby(pd.Grouper(key='Incident Date', freq='3D
 period_count = period_groupby.count()
 period_count = period_count.reset_index()
 period_count = period_count.rename({'Incident Number' : 'Incident Count'}, axis='columns')
+
+print(period_count)
 
 def month_to_season(x):
     if x.month in (12,1,2):
@@ -49,7 +51,7 @@ def month_to_season(x):
     
 period_count['Season'] = period_count['Incident Date'].apply(month_to_season)
 
-fig, axs = plt.subplots(1, 2, figsize=(9,3))
+fig, axs = plt.subplots(1, 2, figsize=(9,3), facecolor=facecolor)
 
 sns.histplot(period_count, x='Incident Count', hue='Season', multiple='dodge', binwidth=2, shrink=.9, ax=axs[0])
 sns.boxplot(period_count, x='Incident Count', y='Season', ax=axs[1])

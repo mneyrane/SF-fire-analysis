@@ -43,6 +43,13 @@ datecmp = lambda x : (x >= L_YEAR) & (x <= U_YEAR)
 
 df = df[datecmp(received_year) & (datecmp(disposition_year) | disposition_year.isna())]
 
+print(f'Data in {L_YEAR}-{U_YEAR} (or NaT) - number of rows: {len(df)}')
+
+# drop rows with empty values
+df = df.dropna()
+
+print(f'Data in {L_YEAR}-{U_YEAR} (NaT dropped) - number of rows: {len(df)}')
+
 # select only fire-related complaints
 fire_related_complaints = [
     'alarm systems',
@@ -56,12 +63,7 @@ fire_related_complaints = [
 
 df = df[df['Complaint Type'].isin(fire_related_complaints)]
 
-print(f'Fire-related data in {L_YEAR}-{U_YEAR} (or NaT) - number of rows: {len(df)}')
-
-# drop rows with empty values
-print('Columns with NaN values (will remove rows):\n', df.isna().any(axis='rows'), sep='')
-
-df = df.dropna()
+print(f'Fire-related data in {L_YEAR}-{U_YEAR} - number of rows: {len(df)}')
 
 # save extracted data
 df.to_csv(csv_out_path, index=False)
