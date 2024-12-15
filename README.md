@@ -1,6 +1,6 @@
 # San Francisco fire service analysis
 
-A hobby data science project to analyze San Francisco's fire service calls, safety complaints and incidents.
+A data analysis portfolio project to analyze San Francisco's fire service calls, safety complaints and incidents.
 A summary of the project and its results is posted on my website [here](https://mneyrane.com/projects/sanfranciscofire).
 The exploration and analysis is done entirely in Python using `pandas`, `geopandas`, `scipy.stats` and `seaborn`.
 
@@ -41,6 +41,8 @@ To download the original data, which can be processed using the scripts under `0
 and export the datasets to CSV format. 
 Save them to the `data/` directory and compress them with **gzip**.
 
+Note that the licenses to these datasets are provided on their corresponding web pages.
+
 ### Code organization
 
 The code is organized in the directories:
@@ -51,7 +53,7 @@ The code is organized in the directories:
 For the data processing, script numbers indicate what order they should be executed in. 
 Scripts sharing the same number are viewed as independent.
 
-Finally, *all the datasets the scripts work on should be placed in the* `data/` *directory*.
+Finally, *all the datasets the scripts work on should be placed in the* `data/` *directory!*
 
 ### Executing scripts
 
@@ -65,7 +67,7 @@ All the data in the analysis was obtained from the [San Francisco open data port
 For service calls, incidents and safety complaints, the analysis only used data extracted over 3 years from 2020 to 2022.
 Some key limitations that could affect the analysis are:
 
-- Zoning districts changing during the 3-year window of our data. The zoning map is updated quarterly and the city undergoes active development. We do not have direct access to earlier versions of the zoning map, but it may be possible to get it from contact through the data maintainer. Therefore, the accuracy of our zone-related analysis in Question 3 crucially relies on zone changes being relatively small.
+- Zoning districts changing during the 3-year window of our data. The zoning map is updated quarterly and the city undergoes active development. We do not have direct access to earlier versions of the zoning map, but it may be possible to get it by contacting the data maintainer. Therefore, the accuracy of our zone-related analysis in Question 3 crucially relies on zone changes being relatively small.
 - A very small number of fire incidents cannot be assigned a zone due to the coverage of geometry. As a workaround, the spatial join assigns a *nearest* zone to each incident.
 - Some of the fire service data contains missing values or erroneous date entries. We did not attempt to correct them and instead omitted them from the analysis. After removing these entries, we still retain at least 98% of the data in each dataset.
 
